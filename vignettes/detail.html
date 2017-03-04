@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<meta name="author" content="Tom Mullie" />
+
+<meta name="date" content="2017-03-04" />
+
+<title>Mapping FARS Data</title>
+
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
+
+
+
+<link href="data:text/css;charset=utf-8,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23header%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%20code%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" rel="stylesheet" type="text/css" />
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Mapping FARS Data</h1>
+<h4 class="author"><em>Tom Mullie</em></h4>
+<h4 class="date"><em>2017-03-04</em></h4>
+
+
+
+<p>This package is designed to analyse and plot data from the <strong>Fatality Analysis Reporting System</strong>, or <strong>FARS</strong>. Information about the FARS system is available <a href="https://www.nhtsa.gov/Data/Fatality-Analysis-Reporting-System-(FARS)">at this address</a>.</p>
+<div id="fars-data" class="section level2">
+<h2>FARS Data</h2>
+<p>This package is designed to parse FARS data stored by year in comma separated values format. The data should be saved in the working directory.</p>
+</div>
+<div id="dependencies" class="section level2">
+<h2>Dependencies</h2>
+<p>This package requires several packages to be available in order to funcion: * magrittr * dplyr * tidyr * maps * graphics</p>
+</div>
+<div id="using-the-package" class="section level2">
+<h2>Using the Package</h2>
+<p>Two functions in the package will be of interest to users: “fars_summarize_years(years)”&quot; and “fars_map_state(state.num, year)”. Other functions, “fars_read”“,”make_filename“” and “fars_read_years” are made available for the purposes of error checking, but will be of little interest in terms of data analysis.</p>
+</div>
+<div id="analysing-fars-incident-counts" class="section level2">
+<h2>Analysing FARS Incident Counts</h2>
+<p>The “fars_summarize_years(years)”&quot; function produces a summary table of the number of FARS incidents in each month of a given year or group of years. For example, if data were available for 2013, 2014 and 2015, a summary table of incidents by month in each of those years could be generated by:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">fars_summarize_years</span>(<span class="kw">c</span>(<span class="dv">2013</span>, <span class="dv">2014</span>, <span class="dv">2015</span>))</code></pre></div>
+<pre><code>## # A tibble: 12 × 4
+##    MONTH `2013` `2014` `2015`
+## *  &lt;int&gt;  &lt;int&gt;  &lt;int&gt;  &lt;int&gt;
+## 1      1   2230   2168   2368
+## 2      2   1952   1893   1968
+## 3      3   2356   2245   2385
+## 4      4   2300   2308   2430
+## 5      5   2532   2596   2847
+## 6      6   2692   2583   2765
+## 7      7   2660   2696   2998
+## 8      8   2899   2800   3016
+## 9      9   2741   2618   2865
+## 10    10   2768   2831   3019
+## 11    11   2615   2714   2724
+## 12    12   2457   2604   2781</code></pre>
+</div>
+<div id="mapping-fars-incidents-in-a-state" class="section level2">
+<h2>Mapping FARS Incidents in a State</h2>
+<p>The “fars_map_state(state.num, year)”&quot; produces a map of all FARS incidents in a state in a given year. For example, to plot all of the FARS incidents in California in 2014, use the following code:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">fars_map_state</span>(<span class="dv">6</span>,<span class="dv">2014</span>)</code></pre></div>
+<p>Which should produce the plot below:</p>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<p>A vector map of California, with dots indicating the locatoin of each FARS incident.</p>
+</div>
+
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

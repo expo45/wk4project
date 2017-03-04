@@ -1,0 +1,14 @@
+Package: wk4project
+Title: Mapping FARS Data
+Version: 0.0.0.9000
+Authors@R: person("Tom", "Mullie", email = "tom.mullie@gmail.com", role = c("aut", "cre"))
+Description: this package allows users to map FARS incidents in a state, as well as to calculate the number of FARS incidents in a given year.
+Depends: R (>= 3.3.2), dplyr, magrittr, maps, readr, tidyr
+License: CC0
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 6.0.0
+Suggests: knitr,
+    rmarkdown,
+    testthat
+VignetteBuilder: knitr
